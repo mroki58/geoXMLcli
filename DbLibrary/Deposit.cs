@@ -4,7 +4,7 @@ using Microsoft.Identity.Client;
 
 namespace DbLibrary;
 
-class Deposit
+public class Deposit
 {
     private Deposit(string _name)
     {
@@ -65,6 +65,44 @@ class Deposit
         return result;
     }
 
+    public static Deposit createDepositByXml(string xml)
+    {
+        XmlDocument doc = new XmlDocument();
+        doc.LoadXml(xml);
+
+        XmlNode? depositNode = doc.SelectSingleNode("/deposit");
+        if (depositNode == null)
+            throw new Exception("Invalid XML format: missing <deposit> element");
+
+        // Pobierz nazwę z atrybutu lub węzła <name>
+        string depositName = depositNode.Attributes?["name"]?.Value 
+                         ?? depositNode.SelectSingleNode("name")?.InnerText 
+                         ?? string.Empty;
+
+        Deposit deposit = new Deposit(depositName);
+
+        XmlNode? geologyNode = depositNode.SelectSingleNode("geology");
+        if (geologyNode != null)
+        {
+            deposit.geology.Type = geologyNode.SelectSingleNode("type")?.InnerText;
+            deposit.geology.EstimatedVolume = double.Parse(geologyNode.SelectSingleNode("estimatedVolume")?.InnerText ?? "0");
+            deposit.geology.Depth = double.Parse(geologyNode.SelectSingleNode("depth")?.InnerText ?? "0");
+            deposit.geology.Status = geologyNode.SelectSingleNode("status")?.InnerText;
+        }
+
+        XmlNode? geographyNode = depositNode.SelectSingleNode("geography");
+        if (geographyNode != null)
+        {
+            deposit.geography.Location = geographyNode.SelectSingleNode("location")?.InnerText;
+            deposit.geography.Region = geographyNode.SelectSingleNode("region")?.InnerText;
+            deposit.geography.Latitude = double.Parse(geographyNode.SelectSingleNode("latitude")?.InnerText ?? "0");
+            deposit.geography.Longitude = double.Parse(geographyNode.SelectSingleNode("longitude")?.InnerText ?? "0");
+            deposit.geography.Radius = double.Parse(geographyNode.SelectSingleNode("radius")?.InnerText ?? "0");
+        }
+
+        return deposit;
+    }
+
 
 
     public string name { get; set; }
@@ -73,7 +111,7 @@ class Deposit
 
 }
 
-class Geology
+public class Geology
 {
     public string? Type { get; set; }
     public double EstimatedVolume { get; set; }
@@ -81,7 +119,7 @@ class Geology
     public string? Status { get; set; } // może być enumem
 }
 
-class Geography
+public class Geography
 {
     public string? Location { get; set; }
     public string? Region { get; set; }

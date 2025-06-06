@@ -37,7 +37,7 @@ class Utils
 
     public static void validateValue(string value)
     {
-        if (!Regex.IsMatch(value, @"^[a-zA-Z0-9.,]+$"))
+        if (!Regex.IsMatch(value, @"^[\p{L}0-9 .,\-]+$"))
         {
             throw new ArgumentException("Invalid Value");
         }
