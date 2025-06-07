@@ -19,11 +19,11 @@ public interface IXmlRepo
     int ModifyRadius(double radius, int id);
     int ModifyName(string name, int id);
     int ModifyEstimatedVolume(double estimatedVolume, int id);
-    int ModifyGeography(string geographyXml, int id);
-    int ModifyGeology(string geologyXml, int id);
     int DeleteByName(string name);
     int DeleteForLocation(string location);
     int DeleteForQuantityLessThan(double maxValue);
+
+    int ClearXmlTable();
 }
 
 public class XmlRepo : IXmlRepo
@@ -226,33 +226,6 @@ public class XmlRepo : IXmlRepo
         return ModifyNodeValue("/deposit/geology/estimatedVolume", estimatedVolume.ToString("F1", CultureInfo.InvariantCulture), id);
     }
 
-    public int ModifyGeography(string geographyXml, int id)
-    {
-        return ModifyNodeXml("/deposit/geography", geographyXml, id);
-    }
-
-    public int ModifyGeology(string geologyXml, int id)
-    {
-        return ModifyNodeXml("/deposit/geology", geologyXml, id);
-    }
-    public int ModifyNodeXml(string path, string xml, int id)
-    {
-        Utils.validateXPath(path);
-        XmlDocument xmlDocument = Utils.validateXML(xml);
-
-        string query = "UPDATE dbo.xmltable " +
-                       $"SET Content.modify('replace value of ({path}/text())[1] with sql:variable(\"@xml_value\")') " +
-                       "WHERE id = @id";
-
-        SqlParameter[] parameters =
-        {
-            new SqlParameter("@xml_value", xmlDocument.OuterXml),
-            new SqlParameter("@id", id)
-        };
-
-        return Modify(query, parameters);
-    }
-
     public int ModifyNodeValue(string path, string value, int id)
     {
         Utils.validateXPath(path);
@@ -329,7 +302,7 @@ public class XmlRepo : IXmlRepo
         string query = @"
             DELETE FROM dbo.xmltable
             WHERE Content.exist(" +
-               $"'{path}[text() < sql:variable(\"@maxValue\")]' = 1 ";
+               $"'{path}[text() < sql:variable(\"@maxValue\")]') = 1 ";
 
         SqlParameter[] parameters =
         {
@@ -353,6 +326,18 @@ public class XmlRepo : IXmlRepo
         return Delete(query, parameters);
     }
 
+    public int ClearXmlTable()
+    {
+        string query = "DELETE FROM dbo.xmltable";
+        using (var connection = db_connect.GetConnection())
+        {
+            connection.Open();
+            using (var cmd = new SqlCommand(query, connection))
+            {
+                return cmd.ExecuteNonQuery();
+            }
+        }
+    }
 
     private int Delete(string query, SqlParameter[] parameters)
     {
