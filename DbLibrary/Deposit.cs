@@ -5,6 +5,11 @@ using System.Globalization;
 
 namespace DbLibrary;
 
+// Obiekt deposit reprezentujący złoże - typ danych przechowywany w bazie danych
+// Zawiera informacje o geologii i geografii złoża
+// Posiada metody do tworzenia złoża, ustawiania geologii i geografii, generowania XML z bazy danych
+// oraz tworzenia złoża z XML
+// Wykorzystuje klasę DbConnectionManager do zarządzania połączeniem z bazą danych
 public class Deposit
 {
     private Deposit(string _name)
@@ -15,6 +20,7 @@ public class Deposit
 
     }
 
+    // Tworzenie złoża przy pomocy wzorca budowniczego
     public static Deposit CreateDeposit(string name)
     {
         return new Deposit(name);
@@ -37,6 +43,7 @@ public class Deposit
         geography.Radius = rad;
     }
 
+    // Do tworzenia elementu wykorzystuje się procedurę składowaną w bazie danych
     public string? createXmlUsingDb(DbConnectionManager db)
     {
         string? result;
@@ -66,6 +73,7 @@ public class Deposit
         return result;
     }
 
+    // Wykorzystuje typ XmlDocument do odczytania XML i utworzenia z niego obiektu Deposit
     public static Deposit createDepositByXml(string xml)
     {
         XmlDocument doc = new XmlDocument();
@@ -75,8 +83,8 @@ public class Deposit
         if (depositNode == null)
             throw new Exception("Invalid XML format: missing <deposit> element");
 
-        string depositName = depositNode.Attributes?["name"]?.Value 
-                         ?? depositNode.SelectSingleNode("name")?.InnerText 
+        string depositName = depositNode.Attributes?["name"]?.Value
+                         ?? depositNode.SelectSingleNode("name")?.InnerText
                          ?? string.Empty;
 
         Deposit deposit = new Deposit(depositName);

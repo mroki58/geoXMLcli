@@ -3,6 +3,7 @@ using DotNetEnv;
 
 namespace DbLibrary;
 
+// Klasa do pobierania połączenia z bazą danych
 public class DbConnectionManager
 {
     public readonly string? ConnectionString;

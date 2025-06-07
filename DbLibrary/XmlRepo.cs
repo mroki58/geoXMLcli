@@ -4,8 +4,11 @@ using Microsoft.Data.SqlClient;
 
 namespace DbLibrary;
 
+// Metody interfejsu IXmlRepo to te testowane w skrypcie ApiTestingScript/
+// Funkcje robią dokładnie to co sugeruje ich nazwa
 public interface IXmlRepo
 {
+    // path może być wykorzystany do pobierania konkretnej części XML
     string GetElementById(int id, string path = ".");
     string GetGeologyElementById(int id);
     string GetGeographyElementById(int id);
@@ -22,7 +25,7 @@ public interface IXmlRepo
     int DeleteByName(string name);
     int DeleteForLocation(string location);
     int DeleteForQuantityLessThan(double maxValue);
-
+    // Czyści całą tabelę
     int ClearXmlTable();
 }
 

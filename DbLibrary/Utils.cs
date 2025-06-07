@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 
 namespace DbLibrary;
 
+// Przechowuje metody pomocnicze do walidacji XML, XPath i wartości
+// Używane w klasie XmlRepo do walidacji danych przed ich zapisaniem lub przetworzeniem
 public class Utils
 {
     public static XmlDocument validateXML(string xml)
@@ -42,5 +44,5 @@ public class Utils
             throw new ArgumentException("Invalid Value");
         }
     }
-    
+
 }
