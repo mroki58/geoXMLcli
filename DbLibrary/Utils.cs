@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace DbLibrary;
 
-class Utils
+public class Utils
 {
     public static XmlDocument validateXML(string xml)
     {

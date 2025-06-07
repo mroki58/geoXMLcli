@@ -1,6 +1,7 @@
 using System.Xml;
 using Microsoft.Data.SqlClient;
 using Microsoft.Identity.Client;
+using System.Globalization;
 
 namespace DbLibrary;
 
@@ -74,7 +75,6 @@ public class Deposit
         if (depositNode == null)
             throw new Exception("Invalid XML format: missing <deposit> element");
 
-        // Pobierz nazwę z atrybutu lub węzła <name>
         string depositName = depositNode.Attributes?["name"]?.Value 
                          ?? depositNode.SelectSingleNode("name")?.InnerText 
                          ?? string.Empty;
@@ -85,8 +85,12 @@ public class Deposit
         if (geologyNode != null)
         {
             deposit.geology.Type = geologyNode.SelectSingleNode("type")?.InnerText;
-            deposit.geology.EstimatedVolume = double.Parse(geologyNode.SelectSingleNode("estimatedVolume")?.InnerText ?? "0");
-            deposit.geology.Depth = double.Parse(geologyNode.SelectSingleNode("depth")?.InnerText ?? "0");
+            deposit.geology.EstimatedVolume = double.Parse(
+                geologyNode.SelectSingleNode("estimatedVolume")?.InnerText ?? "0",
+                CultureInfo.InvariantCulture);
+            deposit.geology.Depth = double.Parse(
+                geologyNode.SelectSingleNode("depth")?.InnerText ?? "0",
+                CultureInfo.InvariantCulture);
             deposit.geology.Status = geologyNode.SelectSingleNode("status")?.InnerText;
         }
 
@@ -95,9 +99,15 @@ public class Deposit
         {
             deposit.geography.Location = geographyNode.SelectSingleNode("location")?.InnerText;
             deposit.geography.Region = geographyNode.SelectSingleNode("region")?.InnerText;
-            deposit.geography.Latitude = double.Parse(geographyNode.SelectSingleNode("latitude")?.InnerText ?? "0");
-            deposit.geography.Longitude = double.Parse(geographyNode.SelectSingleNode("longitude")?.InnerText ?? "0");
-            deposit.geography.Radius = double.Parse(geographyNode.SelectSingleNode("radius")?.InnerText ?? "0");
+            deposit.geography.Latitude = double.Parse(
+                geographyNode.SelectSingleNode("latitude")?.InnerText ?? "0",
+                CultureInfo.InvariantCulture);
+            deposit.geography.Longitude = double.Parse(
+                geographyNode.SelectSingleNode("longitude")?.InnerText ?? "0",
+                CultureInfo.InvariantCulture);
+            deposit.geography.Radius = double.Parse(
+                geographyNode.SelectSingleNode("radius")?.InnerText ?? "0",
+                CultureInfo.InvariantCulture);
         }
 
         return deposit;
